@@ -35,7 +35,7 @@ def download(url, filename):
     print("Download complete")
     obj.release()
     
-
+sys.path.append("./")
 l = []
 with open('list.txt') as csvfile:
     spamreader = csv.reader(csvfile,delimiter="\n")
