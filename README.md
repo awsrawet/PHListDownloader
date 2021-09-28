@@ -1,5 +1,5 @@
 # PhDownloader
-Download your ph videos
+Download your ph videos in batch
 
 Just clone the repo and add your links to the txt file n run the py script.
 
