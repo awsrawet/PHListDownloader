@@ -4,9 +4,21 @@ import csv
 import urllib.request
 import sys
 import requests
+from selenium.webdriver.chrome.options import Options
+import threading
+import time
+
+options = Options()
+options.headless = True
+
+obj = threading.Semaphore(10)#Calculate using your bandwith for optimal result n = Bandwith(mbps)x2 (since xxxsave.net limits downloads to 500kbps)
+
 
 
 def download(url, filename):
+    obj.acquire()
+    print("Downloading video-"+filename+".mp4")
+
     with open(filename, 'wb') as f:
         response = requests.get(url, stream=True)
         total = response.headers.get('content-length')
@@ -20,23 +32,22 @@ def download(url, filename):
                 downloaded += len(data)
                 f.write(data)
                 done = int(50*downloaded/total)
-                sys.stdout.write('\r[{}{}]'.format('█' * done, '.' * (50-done)))
-                sys.stdout.flush()
-    sys.stdout.write('\n')
+    print("Download complete")
+    obj.release()
+    
 
-sys.path.append("./")
 l = []
 with open('list.txt') as csvfile:
     spamreader = csv.reader(csvfile,delimiter="\n")
     for row in spamreader:
         l.append(row[0][:-1])
-driver = webdriver.Firefox()
+driver = webdriver.Chrome(options=options)
 driver.set_page_load_timeout(30)
 driver.implicitly_wait(20)
-i=1
 for x in l:
     driver.get("https://xxxsave.net")
     urlb = driver.find_element_by_name("url")
+    print(x)
     urlb.send_keys(x)
     sb = driver.find_element_by_id("bsubmit")
     sb.click()
@@ -51,8 +62,9 @@ for x in l:
             except Exception:
                 continue
     video_url = db.get_property('href')
-    print("Downloading video"+str(i)+".mp4")
-    # resp = urllib.request.urlretrieve(video_url, 'video'+str(i)+'.mp4')
-    download(video_url,'video'+str(i)+'.mp4')
-    i=i+1
-    print("Download complete")
+    video_title = driver.find_element_by_xpath("//*[@class='vtitle']").text
+    video_title = "".join([c for c in video_title if c.isalpha() or c.isdigit() or c==' ']).rstrip()
+    t = threading.Thread(target=download, args=(video_url,video_title+'.mp4'))
+    t.start()
+    
+
