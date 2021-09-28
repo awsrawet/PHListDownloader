@@ -11,7 +11,7 @@ import time
 options = Options()
 options.headless = True
 
-obj = threading.Semaphore(10)#Calculate using your bandwith for optimal result n = Bandwith(mbps)x2 (since xxxsave.net limits downloads to 500kbps)
+obj = threading.Semaphore(10)#Calculate using your bandwith. For optimal result n = Bandwith(mbps)x2 (since xxxsave.net limits downloads to 500kbps)
 
 
 
